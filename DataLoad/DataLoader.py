@@ -2,6 +2,7 @@ import os
 import zarr
 import torch 
 import numpy as np
+import shutil
 from torch.utils.data import Dataset as TorchDataset
 import dask.array as da
 
@@ -31,8 +32,18 @@ class Dataset(TorchDataset):
         else:
             print(f"Zarr cache found at {self.zarr_cache}. Loading from cache...")
         
-        
-        self.data = zarr.open(self.zarr_cache, mode='r')
+        try:
+            self.data = zarr.open(self.zarr_cache, mode='r')
+        except Exception as cache_error:
+            print(f"Invalid zarr cache at {self.zarr_cache}: {cache_error}")
+            print("Rebuilding zarr cache...")
+            if os.path.isdir(self.zarr_cache):
+                shutil.rmtree(self.zarr_cache, ignore_errors=True)
+            elif os.path.exists(self.zarr_cache):
+                os.remove(self.zarr_cache)
+            self._build_zarr_cache()
+            self.data = zarr.open(self.zarr_cache, mode='r')
+
         self.labels = self._load_array(self.labels)
 
         assert self.data.shape[0] == self.labels.shape[0], "Data and labels must have the same number of samples."

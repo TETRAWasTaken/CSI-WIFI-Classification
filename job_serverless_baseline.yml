@@ -1,0 +1,40 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+display_name: CSI Baseline Serverless Training
+experiment_name: csi-wifi-classification
+
+code: .
+command: >-
+  python -m pip install --disable-pip-version-check zarr "dask[array]" &&
+  python Training/Training_baseline.py
+  --ut_har_root ${{inputs.ut_har_root}}
+  --epochs ${{inputs.epochs}}
+  --batch_size ${{inputs.batch_size}}
+  --num_workers ${{inputs.num_workers}}
+  --learning_rate ${{inputs.learning_rate}}
+  --weight_decay ${{inputs.weight_decay}}
+  --checkpoint_path ${{outputs.model_dir}}/baseline_best.pt
+
+inputs:
+  ut_har_root:
+    type: uri_folder
+    path: azureml:ut_har_data:1
+  epochs: 20
+  batch_size: 64
+  num_workers: 4
+  learning_rate: 0.001
+  weight_decay: 0.0001
+
+outputs:
+  model_dir:
+    type: uri_folder
+
+environment:
+  azureml://registries/azureml/environments/acpt-pytorch-2.2-cuda12.1/versions/48
+
+distribution:
+  type: pytorch
+  process_count_per_instance: 1
+
+limits:
+  timeout: 14400

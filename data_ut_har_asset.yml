@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/data.schema.json
+name: ut_har_data
+version: 1
+type: uri_folder
+description: UT_HAR dataset folder containing data/, label/, and cache/.
+path: ./UT_HAR
