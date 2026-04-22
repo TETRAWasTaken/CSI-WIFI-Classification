@@ -5,3 +5,4 @@ __pycache__
 *.zarr
 *.csv
 *.log
+*.txt

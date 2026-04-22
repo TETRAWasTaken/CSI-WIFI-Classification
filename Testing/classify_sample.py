@@ -14,6 +14,24 @@ if PROJECT_ROOT not in sys.path:
 from paths import Paths
 
 
+LABEL_NAMES = {
+    0: "Lie Down",
+    1: "Fall",
+    2: "Pick Up",
+    3: "Run",
+    4: "Sit Down",
+    5: "Stand Up",
+    6: "Walk",
+}
+
+
+def format_label(label_index: int) -> str:
+    label_name = LABEL_NAMES.get(label_index)
+    if label_name is None:
+        return f"Class {label_index}"
+    return f"{label_index} ({label_name})"
+
+
 def _load_raw_array(file_path: str):
     _, ext = os.path.splitext(file_path)
 
@@ -223,17 +241,17 @@ def main():
         print(f"  Split:      {args.split}")
         print(f"  Index:      {args.sample_index}")
     if true_label is not None:
-        print(f"  True label: {true_label}")
+        print(f"  True label: {format_label(true_label)}")
     print_sample_preview(sample_tensor)
-    print(f"  Predicted:  {result['predicted_class']}")
+    print(f"  Predicted:  {format_label(result['predicted_class'])}")
     print(f"  Confidence: {result['confidence']:.4f}")
     print("  Top classes:")
     for class_index, probability in zip(result["top_classes"], result["top_probabilities"]):
-        print(f"    {class_index}: {probability:.4f}")
+        print(f"    {format_label(class_index)}: {probability:.4f}")
     print("Output guide:")
-    print("  Predicted is the model's most likely class index for this sample.")
+    print("  Predicted shows the most likely UT-HAR activity for this sample.")
     print("  Confidence is the softmax probability for that top class.")
-    print("  Top classes lists the highest-probability class indices in descending order.")
+    print("  Top classes lists the highest-probability activities in descending order.")
     print("  The sample preview shows the normalized input matrix used by the model.")
 
 
